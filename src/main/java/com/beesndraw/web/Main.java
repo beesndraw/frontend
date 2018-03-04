@@ -107,9 +107,10 @@ public class Main extends HttpServlet {
 
 		String fullPath = repository.getAbsolutePath();
 		try { 
-			generateReport(fullPath, path, fullPath + "report.csv");
-			File responseFile = new File(fullPath + "report.csv");
+			generateReport(fullPath, path, fullPath + "/report.csv");
+			File responseFile = new File(fullPath + "/report.csv");
 			PrintWriter out = response.getWriter();
+			System.out.println("Sending file as response: " + responseFile.getAbsolutePath());
 			response.setContentType("text/html");
 			response.setHeader("Content-Disposition","attachment; filename="+"report.csv");
 			FileInputStream fileToDownload = new FileInputStream(responseFile);
