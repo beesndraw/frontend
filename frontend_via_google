@@ -1,0 +1,28 @@
+https://www.youtube.com/watch?annotation_id=annotation_1708545089&feature=iv&src_vid=LrjpcR-IJwY&v=gxZvofAvgHQ
+
+git clone https://github.com/GoogleCloudPlatform/todomvc-mongodb.git
+
+Install the dependencies
+Now that you're connected to your frontend instance, update packages and install git, Node.js and npm. When asked if you want to continue, type \'Y\':
+
+sudo apt-get update
+
+curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
+
+sudo apt-get install git nodejs
+
+Install and run the frontend web app
+Clone the sample application and install application dependencies.
+
+git clone https://github.com/GoogleCloudPlatform/todomvc-mongodb.git
+
+cd todomvc-mongodb; npm install
+
+sed -i -e 's/8080/80/g' server.js
+
+Start the todo web application with the following command:
+
+sudo nohup nodejs server.js --be_ip 10.142.0.2 --fe_ip 10.142.0.3 &
+
+After, exit the SSH session using the exit command:
+
