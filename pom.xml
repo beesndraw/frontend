@@ -48,7 +48,7 @@
 							<includeScope>compile</includeScope>
 							<includeTypes>jar</includeTypes>
 							<excludeTransitive>true</excludeTransitive>
-							<outputDirectory>WebContent/WEB-INF/lib</outputDirectory>
+							<outputDirectory>src/main/webapp/WEB-INF/lib</outputDirectory>
 							<overWriteIfNewer>true</overWriteIfNewer>
 							<overWriteReleases>false</overWriteReleases>
 							<overWriteSnapshots>true</overWriteSnapshots>

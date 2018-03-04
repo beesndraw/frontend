@@ -105,8 +105,7 @@ public class Main extends HttpServlet {
 
 
 
-		String fullPath = servletContext.getRealPath("/WEB-INF/tmp/");
-
+		String fullPath = repository.getAbsolutePath();
 		try {
 			String fileName = generateReport(fullPath, path, fullPath + "report.csv");
 			File responseFile = new File(path);
@@ -141,11 +140,10 @@ public class Main extends HttpServlet {
 			String contentType = item.getContentType();
 			boolean isInMemory = item.isInMemory();
 			long sizeInBytes = item.getSize();
-			System.out.println("Saving file " + fileName);
 			ServletContext servletContext = this.getServletConfig().getServletContext();
-			String fullPath = servletContext.getRealPath("/WEB-INF/tmp/");
-
-			File uploadedFile = new File(fullPath + fileName);
+			File repository = (File) servletContext.getAttribute("javax.servlet.context.tempdir");
+			File uploadedFile = new File(repository.getAbsolutePath() + "/" + fileName);
+			System.out.println("Saving file " + uploadedFile.getAbsolutePath());
 			item.write(uploadedFile);
 			return uploadedFile.getAbsolutePath();
 		}
