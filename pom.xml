@@ -109,7 +109,7 @@
 				<artifactId>maven-war-plugin</artifactId>
 				<version>2.5</version>
 				<configuration>
-					<webappDirectory>WebContent</webappDirectory>
+					<webappDirectory>src/main/webapp</webappDirectory>
 				</configuration>
 			</plugin>
 		</plugins>
