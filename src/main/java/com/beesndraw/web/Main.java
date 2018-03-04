@@ -106,13 +106,13 @@ public class Main extends HttpServlet {
 
 
 		String fullPath = repository.getAbsolutePath();
-		try {
-			String fileName = generateReport(fullPath, path, fullPath + "report.csv");
-			File responseFile = new File(path);
+		try { 
+			generateReport(fullPath, path, fullPath + "report.csv");
+			File responseFile = new File(fullPath + "report.csv");
 			PrintWriter out = response.getWriter();
 			response.setContentType("text/html");
 			response.setHeader("Content-Disposition","attachment; filename="+"report.csv");
-			FileInputStream fileToDownload = new FileInputStream(path);
+			FileInputStream fileToDownload = new FileInputStream(responseFile);
 			response.setContentLength(fileToDownload.available());
 			int c;
 			while((c=fileToDownload.read()) != -1){
@@ -122,7 +122,6 @@ public class Main extends HttpServlet {
 			out.close();
 			fileToDownload.close();
 		}catch(Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			err = e.getMessage();
 			PrintWriter out = response.getWriter();
