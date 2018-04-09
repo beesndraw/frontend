@@ -6,11 +6,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.lang.model.util.Elements;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -20,6 +18,10 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 //Extend HttpServlet class
 public class Main extends HttpServlet {
@@ -53,19 +55,19 @@ public class Main extends HttpServlet {
 	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		Enumeration headerNames = request.getHeaderNames();
-		while(headerNames.hasMoreElements()) {
-			String headerName = (String)headerNames.nextElement();
-			System.out.println(headerName + " -> "  +request.getHeader(headerName));
-		}
-
-		System.out.println("\n\nParameters");
-
-		Enumeration params = request.getParameterNames();
-		while(params.hasMoreElements()) {
-			String paramName = (String)params.nextElement();
-			System.out.println(paramName + " -> "  +request.getParameter(paramName));
-		}
+//		Enumeration headerNames = request.getHeaderNames();
+//		while(headerNames.hasMoreElements()) {
+//			String headerName = (String)headerNames.nextElement();
+//			System.out.println(headerName + " -> "  +request.getHeader(headerName));
+//		}
+//
+//		System.out.println("\n\nParameters");
+//
+//		Enumeration params = request.getParameterNames();
+//		while(params.hasMoreElements()) {
+//			String paramName = (String)params.nextElement();
+//			System.out.println(paramName + " -> "  +request.getParameter(paramName));
+//		}
 
 		boolean isMultipart = ServletFileUpload.isMultipartContent(request);
 		// Create a factory for disk-based file items
@@ -99,7 +101,6 @@ public class Main extends HttpServlet {
 			}
 
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			err = e.getMessage();
 			PrintWriter out = response.getWriter();
@@ -107,15 +108,18 @@ public class Main extends HttpServlet {
 			return;
 		}
 
-		String fullPath = repository.getAbsolutePath();
+		String rootPath = repository.getAbsolutePath();
 		try { 
 			if(request.getPathInfo().endsWith("reportgenerator")) {
-				generateReport(fullPath, path, fullPath + "/report.csv");
-				File responseFile = new File(fullPath + "/report.csv");
+				File file = new File(path);
+				String targetFileName = file.getName().substring(0, file.getName().lastIndexOf("."));
+				String finalFileName = rootPath + "/" + targetFileName + "_report.csv";
+				generateReport(rootPath, path, finalFileName);
+				File responseFile = new File(finalFileName);
 				PrintWriter out = response.getWriter();
 				System.out.println("Sending file as response: " + responseFile.getAbsolutePath());
 				response.setContentType("text/html");
-				response.setHeader("Content-Disposition","attachment; filename="+"report.csv");
+				response.setHeader("Content-Disposition","attachment; filename="+ responseFile.getName());
 				FileInputStream fileToDownload = new FileInputStream(responseFile);
 				response.setContentLength(fileToDownload.available());
 				int c;
@@ -127,12 +131,13 @@ public class Main extends HttpServlet {
 				fileToDownload.close();				
 			}else if(request.getPathInfo().endsWith("converttocsv")) {
 				File file = new File(path);
-				converHtmlToCSV(fullPath, path, fullPath + "/" + file.getName() +".csv");
-				File responseFile = new File(fullPath + "/" + file.getName() +".csv");
+				String targetFileName = file.getName().substring(0, file.getName().lastIndexOf("."));
+				converHtmlToCSV(rootPath, path, rootPath + "/" + targetFileName +".csv");
+				File responseFile = new File(rootPath + "/" + targetFileName +".csv");
 				PrintWriter out = response.getWriter();
 				System.out.println("Sending file as response: " + responseFile.getAbsolutePath());
 				response.setContentType("text/html");
-				response.setHeader("Content-Disposition","attachment; filename="+"report.csv");
+				response.setHeader("Content-Disposition","attachment; filename="+responseFile.getName());
 				FileInputStream fileToDownload = new FileInputStream(responseFile);
 				response.setContentLength(fileToDownload.available());
 				int c;
@@ -156,21 +161,42 @@ public class Main extends HttpServlet {
 
 	}
 
-	private void converHtmlToCSV(String folder, String source, String target) {
+	private void converHtmlToCSV(String folder, String source, String target) throws Exception {
 		String html = FileSystemUtils.readFile(source);
+		System.out.println("Parsing html file");
 		Document doc = Jsoup.parse(html);
-		ArrayList<String> downServers = new ArrayList<>();
+		ArrayList<String> csvData = new ArrayList<>();
 		Element table = doc.select("table").get(0); //select the first table.
 		Elements rows = table.select("tr");
+		//Headers
+		Element headerRow = rows.get(0);
+	    Elements headerName = headerRow.select("td");
+	    StringBuffer buffer = new StringBuffer();
+	    for(int col=0; col < headerName.size(); col++) {
+	    		buffer.append(headerName.get(col).text());
+	    		buffer.append(",");
+	    }
+		System.out.println("Header is "  + buffer.toString());
 
-		for (int i = 1; i < rows.size(); i++) { //first row is the col names so skip it.
+	    csvData.add(buffer.toString());
+		for (int i = 1; i < rows.size(); i++) { //Rest of rows are data.
 		    Element row = rows.get(i);
 		    Elements cols = row.select("td");
-
-		    if (cols.get(7).text().equals("down")) {
-		        downServers.add(cols.get(5).text());
+		    buffer = new StringBuffer();
+		    for(int col=0; col < cols.size(); col++) {
+		    		String data = cols.get(col).text();
+		    		data = data.replaceAll(",", "");
+		    		buffer.append(data);
+		    		buffer.append(",");
 		    }
+		    csvData.add(buffer.toString());
 		}
+		System.out.println("Total records: "  + (csvData.size() - 1));
+
+//		for(String csv : csvData) {
+//			System.out.println(csv);
+//		}
+		FileSystemUtils.saveFile(target, csvData);
 	}
 
 	private String processUploadedFile(FileItem item) throws Exception {

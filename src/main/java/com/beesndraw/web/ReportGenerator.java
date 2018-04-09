@@ -32,7 +32,7 @@ public class ReportGenerator {
 			DATE_FORMAT = new SimpleDateFormat(ReportGenerator.getString("dateFormat","MM/dd/yyyy HH:mm"));
 			System.out.println("Reading data from : " + getString("inputFile","input.csv"));
 			System.out.println("Header row is at  : " + getInteger("headerRow",6));
-			CSVParser parsedFile = parseFile(getString("inputFile","input.csv"),getInteger("headerRow",6));
+			CSVParser parsedFile = parseFile(getString("inputFile","input.csv"));
 			String header = parsedFile.getHeader();
 			System.out.println("Header row is  : " + header);			
 			List<Trade> trades = getTrades(parsedFile.getRecords());
@@ -75,12 +75,12 @@ public class ReportGenerator {
 		return trades;
 	}
 
-	private static CSVParser parseFile(String string, int linesToCutOff) throws Exception {
+	private static CSVParser parseFile(String string) throws Exception {
 		File file = new File(string);
 		if(!file.exists())
 			throw new Exception("File not found: Please provide full path. " + string);
 		String body = FileSystemUtils.readFile(string);
-		CSVParser parser = new CSVParser(linesToCutOff, body);
+		CSVParser parser = new CSVParser(body);
 		return parser;
 	}
 
@@ -90,10 +90,9 @@ public class ReportGenerator {
 		System.out.println("===================================");
 		System.out.println("Inputs:");
 		System.out.println("inputFile: File to read Trading Record from");
-		System.out.println("headerRow: Deafult is 6, where the header columns is there.");
 		System.out.println("outputFile: Files to write Trading Record from");
 		System.out.println("===================================");
-		System.out.println("java -DinputFile=./parsed.csv -DheaderRow=7 -DoutputFile=./output.csv -jar ReportGenerator.jar ");
+		System.out.println("java -DinputFile=./parsed.csv -DoutputFile=./output.csv -jar ReportGenerator.jar ");
 		System.out.println("\n\n\t\t Reads the csv file, and write output to output.csv in current directlry");
 		System.out.println("===================================");
 
@@ -140,8 +139,7 @@ public class ReportGenerator {
 	public void generate() throws Exception {
 		DATE_FORMAT = new SimpleDateFormat(ReportGenerator.getString("dateFormat","MM/dd/yyyy HH:mm"));
 		System.out.println("Reading data from : " + inputfile);
-		System.out.println("Header row is at  : " + getInteger("headerRow",6));
-		CSVParser parsedFile = parseFile(inputfile,getInteger("headerRow",6));
+		CSVParser parsedFile = parseFile(inputfile);
 		String header = parsedFile.getHeader();
 		System.out.println("Header row is  : " + header);			
 		List<Trade> trades = getTrades(parsedFile.getRecords());

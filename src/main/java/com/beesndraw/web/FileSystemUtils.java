@@ -333,4 +333,13 @@ public class FileSystemUtils {
         }
     }
 
+	public static void saveFile(String target, ArrayList<String> csvData) throws Exception {
+		StringBuffer buffer = new StringBuffer();
+		for(String s: csvData) {
+			buffer.append(s);
+			buffer.append(System.lineSeparator());
+		}
+		saveFile(target, buffer.toString());
+	}
+
 }
