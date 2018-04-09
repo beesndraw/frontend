@@ -113,7 +113,21 @@ Licence URI: http://www.os-templates.com/template-terms
 	          <p>Select a file containing CSV record and please upload</p>
 	          <p class="btmspace-30">The file will be uploaded to server for processing.</p>
 		 <footer>
-		 <form id="uploadFile" enctype="multipart/form-data" method="post" action="/BeesndrawTrading/process">
+		 <form id="uploadFile" enctype="multipart/form-data" method="post" action="/BeesndrawTrading/v1/reportgenerator">
+		   <input class="btn" name="csvfile" type="file" />
+		   <input class="btn" type="submit" value="Upload" id="submit" />
+		</form>
+		</footer>
+        </div>
+         <div class="one_quarter first">
+          <p class="font-xs">Html Trades to CSV Generator</p>
+          <h6 class="heading">Convert HTML Report to CSV file</h6>
+        </div>
+        <div class="three_quarter">
+	          <p>Select a html file containing records and please upload</p>
+	          <p class="btmspace-30">The file will be uploaded to server for processing.</p>
+		 <footer>
+		 <form id="uploadFileToCSV" enctype="multipart/form-data" method="post" action="/BeesndrawTrading/v1/converttocsv">
 		   <input class="btn" name="csvfile" type="file" />
 		   <input class="btn" type="submit" value="Upload" id="submit" />
 		</form>

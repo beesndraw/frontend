@@ -16,6 +16,6 @@
   </servlet>
   <servlet-mapping>
     <servlet-name>beesndrawtrading</servlet-name>
-    <url-pattern>/process</url-pattern>
+    <url-pattern>/v1/*</url-pattern>
   </servlet-mapping>
 </web-app>

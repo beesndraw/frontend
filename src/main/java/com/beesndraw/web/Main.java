@@ -5,10 +5,12 @@ import java.io.FileInputStream;
 //Import required java libraries
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.lang.model.util.Elements;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -30,7 +32,7 @@ public class Main extends HttpServlet {
 		message = "Server is up and running";
 		System.out.println("------------------------------------------------");
 		System.out.println("Initializing Report Gen BackEnd");
-		System.out.println("http://localhost:8080/ReportGenFrontEnd/process");
+		System.out.println("http://localhost:8080/<AppName>/v1/process");
 		System.out.println("------------------------------------------------");
 	}
 
@@ -40,10 +42,12 @@ public class Main extends HttpServlet {
 
 		// Set response content type
 		response.setContentType("text/html");
-
+		StringBuffer buffer = new StringBuffer();
+		buffer.append("<h1><a href=\"http://http://localhost:8080/BeesndrawTrading/index.html\"></a></h1>");
+		buffer.append("<br></br><p>Server is up and running. Click above to go to Web Layer</p>");
 		// Actual logic goes here.
 		PrintWriter out = response.getWriter();
-		out.println("<h1>" + message + "</h1>");
+		out.println(buffer.toString());
 	}
 
 	@Override
@@ -103,25 +107,45 @@ public class Main extends HttpServlet {
 			return;
 		}
 
-
-
 		String fullPath = repository.getAbsolutePath();
 		try { 
-			generateReport(fullPath, path, fullPath + "/report.csv");
-			File responseFile = new File(fullPath + "/report.csv");
-			PrintWriter out = response.getWriter();
-			System.out.println("Sending file as response: " + responseFile.getAbsolutePath());
-			response.setContentType("text/html");
-			response.setHeader("Content-Disposition","attachment; filename="+"report.csv");
-			FileInputStream fileToDownload = new FileInputStream(responseFile);
-			response.setContentLength(fileToDownload.available());
-			int c;
-			while((c=fileToDownload.read()) != -1){
-				out.write(c);
+			if(request.getPathInfo().endsWith("reportgenerator")) {
+				generateReport(fullPath, path, fullPath + "/report.csv");
+				File responseFile = new File(fullPath + "/report.csv");
+				PrintWriter out = response.getWriter();
+				System.out.println("Sending file as response: " + responseFile.getAbsolutePath());
+				response.setContentType("text/html");
+				response.setHeader("Content-Disposition","attachment; filename="+"report.csv");
+				FileInputStream fileToDownload = new FileInputStream(responseFile);
+				response.setContentLength(fileToDownload.available());
+				int c;
+				while((c=fileToDownload.read()) != -1){
+					out.write(c);
+				}
+				out.flush();
+				out.close();
+				fileToDownload.close();				
+			}else if(request.getPathInfo().endsWith("converttocsv")) {
+				File file = new File(path);
+				converHtmlToCSV(fullPath, path, fullPath + "/" + file.getName() +".csv");
+				File responseFile = new File(fullPath + "/" + file.getName() +".csv");
+				PrintWriter out = response.getWriter();
+				System.out.println("Sending file as response: " + responseFile.getAbsolutePath());
+				response.setContentType("text/html");
+				response.setHeader("Content-Disposition","attachment; filename="+"report.csv");
+				FileInputStream fileToDownload = new FileInputStream(responseFile);
+				response.setContentLength(fileToDownload.available());
+				int c;
+				while((c=fileToDownload.read()) != -1){
+					out.write(c);
+				}
+				out.flush();
+				out.close();
+				fileToDownload.close();				
+
+			}else {
+
 			}
-			out.flush();
-			out.close();
-			fileToDownload.close();
 		}catch(Exception e) {
 			e.printStackTrace();
 			err = e.getMessage();
@@ -130,6 +154,23 @@ public class Main extends HttpServlet {
 			return;
 		}
 
+	}
+
+	private void converHtmlToCSV(String folder, String source, String target) {
+		String html = FileSystemUtils.readFile(source);
+		Document doc = Jsoup.parse(html);
+		ArrayList<String> downServers = new ArrayList<>();
+		Element table = doc.select("table").get(0); //select the first table.
+		Elements rows = table.select("tr");
+
+		for (int i = 1; i < rows.size(); i++) { //first row is the col names so skip it.
+		    Element row = rows.get(i);
+		    Elements cols = row.select("td");
+
+		    if (cols.get(7).text().equals("down")) {
+		        downServers.add(cols.get(5).text());
+		    }
+		}
 	}
 
 	private String processUploadedFile(FileItem item) throws Exception {
