@@ -139,8 +139,6 @@ public class Trade {
 			    date = null;
 			}
 			String tradePLString = rawData[i++];
-			if(tradePLString.isEmpty())
-				return null;
 			tradePl = parseDouble(tradePLString);
 
 			String profiltLossString = rawData[i++];

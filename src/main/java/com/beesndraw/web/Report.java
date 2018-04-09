@@ -27,15 +27,16 @@ public class Report {
 		}
 	}
 
-	private List<Trade> trades;
-	private Map<String, List<Trade>> tradesByStrategy;
-	private Map<String, List<Trade>> afterHourTrades;
-	private Map<String, List<Trade>> regularHourTrades;
+	protected List<Trade> trades;
+	protected Map<String, List<Trade>> tradesByStrategy;
+	protected Map<String, List<Trade>> afterHourTrades;
+	protected Map<String, List<Trade>> regularHourTrades;
 	public static SimpleDateFormat parser = new SimpleDateFormat("HH:mm");
-	Date sixthirity;
-	Date onefifteen;
-	Date threepm;
-	Date midnight;
+	protected Date sixthirity;
+	protected Date onefifteen;
+	protected Date threepm;
+	protected Date midnight;
+	protected int totalActualTrades;
 	
 	//id, strategy, side, quantize, amount, price, date/time, datetime, trad pl, pl, position
 	//win if -> trad pl > 0
@@ -56,7 +57,7 @@ public class Report {
 		processTrades();
 	}
 
-	private void processTrades() {
+	protected void processTrades() {
 		int totalTrades = this.trades.size();
 		if(totalTrades == 0)
 			return;
@@ -183,34 +184,3 @@ public class Report {
 
 }
 
-class WinLossReport{
-	private List<Trade> trades;
-	int totalTrades;
-	int totalWins;
-	int totalLoss;
-	double winlossPercentage;
-	double totalPL;
-	String name;
-	
-	public WinLossReport(String name, List<Trade> trades) {
-		this.name = name;
-		this.trades = trades;
-		totalWins = 0; 
-		totalLoss = 0;
-		totalTrades = trades.size();
-
-		totalPL = 0;
-		for(Trade t: trades) {
-			if(t.getTradePl() > 0) {
-				totalWins++;
-			}else {
-				totalLoss++;
-			}
-			totalPL += t.getTradePl();
-			//System.out.println(t.getId() + " -> " + t.getTradePl() + " -> Cumulative " + totalPL + " From CSV " + t.getProfileLoss());
-		}
-		winlossPercentage = (totalWins* 100.00)/totalTrades;
-	}
-	
-
-}

@@ -110,47 +110,33 @@ public class Main extends HttpServlet {
 
 		String rootPath = repository.getAbsolutePath();
 		try { 
-			if(request.getPathInfo().endsWith("reportgenerator")) {
-				File file = new File(path);
-				String targetFileName = file.getName().substring(0, file.getName().lastIndexOf("."));
-				String finalFileName = rootPath + "/" + targetFileName + "_report.csv";
-				generateReport(rootPath, path, finalFileName);
-				File responseFile = new File(finalFileName);
-				PrintWriter out = response.getWriter();
-				System.out.println("Sending file as response: " + responseFile.getAbsolutePath());
-				response.setContentType("text/html");
-				response.setHeader("Content-Disposition","attachment; filename="+ responseFile.getName());
-				FileInputStream fileToDownload = new FileInputStream(responseFile);
-				response.setContentLength(fileToDownload.available());
-				int c;
-				while((c=fileToDownload.read()) != -1){
-					out.write(c);
-				}
-				out.flush();
-				out.close();
-				fileToDownload.close();				
+			File file = new File(path);
+			String targetFileName = file.getName().substring(0, file.getName().lastIndexOf("."));
+			String finalFileName = rootPath + "/" + targetFileName + "_report.csv";
+
+			if(request.getPathInfo().endsWith("reportgeneratorextended")) {
+				generateExtendedReport(rootPath, path, finalFileName);				
+			}else if(request.getPathInfo().endsWith("reportgenerator")) {
+				generateReport(rootPath, path, finalFileName);				
 			}else if(request.getPathInfo().endsWith("converttocsv")) {
-				File file = new File(path);
-				String targetFileName = file.getName().substring(0, file.getName().lastIndexOf("."));
 				converHtmlToCSV(rootPath, path, rootPath + "/" + targetFileName +".csv");
-				File responseFile = new File(rootPath + "/" + targetFileName +".csv");
-				PrintWriter out = response.getWriter();
-				System.out.println("Sending file as response: " + responseFile.getAbsolutePath());
-				response.setContentType("text/html");
-				response.setHeader("Content-Disposition","attachment; filename="+responseFile.getName());
-				FileInputStream fileToDownload = new FileInputStream(responseFile);
-				response.setContentLength(fileToDownload.available());
-				int c;
-				while((c=fileToDownload.read()) != -1){
-					out.write(c);
-				}
-				out.flush();
-				out.close();
-				fileToDownload.close();				
-
 			}else {
-
+				//Next feature with file.
 			}
+			File responseFile = new File(rootPath + "/" + targetFileName +"_report.csv");
+			PrintWriter out = response.getWriter();
+			System.out.println("Sending file as response: " + responseFile.getAbsolutePath());
+			response.setContentType("text/html");
+			response.setHeader("Content-Disposition","attachment; filename="+responseFile.getName());
+			FileInputStream fileToDownload = new FileInputStream(responseFile);
+			response.setContentLength(fileToDownload.available());
+			int c;
+			while((c=fileToDownload.read()) != -1){
+				out.write(c);
+			}
+			out.flush();
+			out.close();
+			fileToDownload.close();				
 		}catch(Exception e) {
 			e.printStackTrace();
 			err = e.getMessage();
@@ -159,6 +145,16 @@ public class Main extends HttpServlet {
 			return;
 		}
 
+	}
+
+	private String generateExtendedReport(String path, String inputfile, String output) throws Exception {
+		ExtendedReportGenerator gen = new ExtendedReportGenerator(path, inputfile, output);
+		try {
+			gen.generate();
+			return output;
+		}catch(Exception e) {
+			throw e;
+		}		
 	}
 
 	private void converHtmlToCSV(String folder, String source, String target) throws Exception {
