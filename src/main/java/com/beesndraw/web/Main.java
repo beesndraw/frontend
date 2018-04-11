@@ -190,7 +190,7 @@ public class Main extends HttpServlet {
 		    }
 		    csvData.add(buffer.toString());
 		}
-		System.out.println("Total records: "  + (csvData.size() - 1) + " out of " + rows.size()) ;
+		System.out.println("Total records: "  + (csvData.size()) + " out of " + rows.size()) ;
 
 //		for(String csv : csvData) {
 //			System.out.println(csv);

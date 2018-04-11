@@ -35,7 +35,7 @@ public class Statistics {
 	    totalWeeks = ChronoUnit.WEEKS.between(pstartDate, pendDate);
 
 	    if(totalWeeks > 0)
-			profitPerWeek = sum.totalPL / totalWeeks;
+			profitPerWeek = sum.netProfitLessFees / totalWeeks;
 		
 	}
 	

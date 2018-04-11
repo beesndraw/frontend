@@ -35,7 +35,7 @@ public class WinLossReport{
 		double sumWin = 0; double sumLoss = 0;
 		rounds = new ArrayList<>();
 		for(Trade t: trades) {
-			if(t.getTradePl() != 0) {
+			if(t.isRound()) {
 				rounds.add(t);
 			}
 		}
@@ -46,15 +46,14 @@ public class WinLossReport{
 				totalWins++;
 				sumWin += t.getTradePl();
 			}else {
-				totalLoss++;
 				sumLoss += t.getTradePl();
 			}
 			totalPL += t.getTradePl();
-			//System.out.println(t.getId() + " -> " + t.getTradePl() + " -> Cumulative " + totalPL + " From CSV " + t.getProfileLoss());
 		}
 		
 		
-		
+		totalLoss = totalRounds - totalWins;
+
 		if(totalRounds > 0)
 			winlossPercentage = (totalWins* 100.00)/totalRounds;
 

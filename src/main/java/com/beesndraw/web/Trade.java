@@ -14,10 +14,10 @@ public class Trade {
 	double tradePl;
 	double profileLoss;
 	String position;
-
+	boolean round;
 
 	public Trade(int id, String strategy, String side, double quantity, double amount, double price, Date date, double tradePl,
-			double profileLoss, String position) {
+			double profileLoss, String position, boolean round) {
 		super();
 		this.id = id;
 		this.strategy = strategy;
@@ -29,8 +29,13 @@ public class Trade {
 		this.tradePl = tradePl;
 		this.profileLoss = profileLoss;
 		this.position = position;
+		this.round = round;
 	}
 
+	public boolean isRound() {
+		return this.round;
+	}
+	
 	public int getId() {
 		return id;
 	}
@@ -142,10 +147,14 @@ public class Trade {
 //			if(tradePLString.isEmpty())
 //				return null;
 			tradePl = parseDouble(tradePLString);
+			boolean round = false;
+			if(!tradePLString.isEmpty())
+				round = true;
 			String profiltLossString = rawData[i++];
+
 			profileLoss = parseDouble(profiltLossString);
 			position = rawData[i++];;
-			return new Trade(id, strategy, side,quantity, amount, price, date, tradePl, profileLoss, position);			
+			return new Trade(id, strategy, side,quantity, amount, price, date, tradePl, profileLoss, position, round);			
 		}catch(Exception e) {
 			System.err.println("Skipping this row. Failed to parse record: " + string);
 			System.err.println(e.getMessage());
@@ -184,6 +193,13 @@ public class Trade {
 		else {
 			return 0.0;
 		}
+	}
+
+	@Override
+	public String toString() {
+		return "Trade [id=" + id + ", strategy=" + strategy + ", side=" + side + ", quantity=" + quantity + ", amount="
+				+ amount + ", price=" + price + ", date=" + date + ", tradePl=" + tradePl + ", profileLoss="
+				+ profileLoss + ", position=" + position + "]";
 	}
 
 
