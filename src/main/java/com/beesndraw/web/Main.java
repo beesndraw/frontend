@@ -92,7 +92,6 @@ public class Main extends HttpServlet {
 			Iterator<FileItem> iter = items.iterator();
 			while (iter.hasNext()) {
 				FileItem item = iter.next();
-
 				if (item.isFormField()) {
 					processFormField(item);
 				} else {
@@ -112,18 +111,21 @@ public class Main extends HttpServlet {
 		try { 
 			File file = new File(path);
 			String targetFileName = file.getName().substring(0, file.getName().lastIndexOf("."));
-			String finalFileName = rootPath + "/" + targetFileName + "_report.csv";
+			String finalFileName = rootPath + "/" + targetFileName;
 
 			if(request.getPathInfo().endsWith("reportgeneratorextended")) {
-				generateExtendedReport(rootPath, path, finalFileName);				
+				generateExtendedReport(rootPath, path, finalFileName + "_report.csv");	
+				targetFileName +=   "_report.csv";
 			}else if(request.getPathInfo().endsWith("reportgenerator")) {
-				generateReport(rootPath, path, finalFileName);				
+				generateReport(rootPath, path, finalFileName + "_report.csv");				
+				targetFileName +=   "_report.csv";
 			}else if(request.getPathInfo().endsWith("converttocsv")) {
 				converHtmlToCSV(rootPath, path, rootPath + "/" + targetFileName +".csv");
+				targetFileName +=   ".csv";
 			}else {
 				//Next feature with file.
 			}
-			File responseFile = new File(rootPath + "/" + targetFileName +"_report.csv");
+			File responseFile = new File(rootPath + "/" + targetFileName);
 			PrintWriter out = response.getWriter();
 			System.out.println("Sending file as response: " + responseFile.getAbsolutePath());
 			response.setContentType("text/html");
@@ -165,6 +167,7 @@ public class Main extends HttpServlet {
 		Element table = doc.select("table").get(0); //select the first table.
 		Elements rows = table.select("tr");
 		//Headers
+		int totalRows = rows.size();
 		Element headerRow = rows.get(0);
 	    Elements headerName = headerRow.select("td");
 	    StringBuffer buffer = new StringBuffer();
@@ -187,7 +190,7 @@ public class Main extends HttpServlet {
 		    }
 		    csvData.add(buffer.toString());
 		}
-		System.out.println("Total records: "  + (csvData.size() - 1));
+		System.out.println("Total records: "  + (csvData.size() - 1) + " out of " + rows.size()) ;
 
 //		for(String csv : csvData) {
 //			System.out.println(csv);

@@ -5,6 +5,7 @@ import java.util.List;
 
 public class WinLossReport{
 	protected List<Trade> trades;
+	protected List<Trade> rounds;
 	int totalTrades;
 	int totalRounds;
 	int totalWins;
@@ -24,6 +25,7 @@ public class WinLossReport{
 	public WinLossReport(String name, List<Trade> trades) {
 		this.name = name;
 		this.trades = trades;
+		
 		totalWins = 0; 
 		totalLoss = 0;
 		totalTrades = trades.size();
@@ -31,9 +33,9 @@ public class WinLossReport{
 		
 		totalPL = 0;
 		double sumWin = 0; double sumLoss = 0;
-		List<Trade> rounds = new ArrayList<>();
+		rounds = new ArrayList<>();
 		for(Trade t: trades) {
-			if(t.getTradePl() > 0) {
+			if(t.getTradePl() != 0) {
 				rounds.add(t);
 			}
 		}
@@ -60,8 +62,12 @@ public class WinLossReport{
 			avgWinsPerRound = sumWin / (totalWins * 1.0);
 		if(totalLoss > 0)
 			avgLossPerRound = sumLoss / (totalLoss * 1.0);
-		if(avgLossPerRound != 0)
+		if(avgLossPerRound != 0) {
 			profitFactor = avgWinsPerRound / avgLossPerRound;
+			if(profitFactor < 0) {
+				profitFactor *= -1;
+			}
+		}
 		maxWin = getMaxWin(trades);
 		maxLoss = getMaxLoss(trades);
 		totalFees = (fee * totalTrades);
@@ -109,7 +115,7 @@ public class WinLossReport{
 
 	private double getMaxLoss(List<Trade> trades2) {
 		double maxLoss = 0;
-		for(Trade t: trades) {
+		for(Trade t: this.rounds) {
 			if(t.getTradePl() < maxLoss)
 				maxLoss = t.getTradePl();
 		}
@@ -118,7 +124,7 @@ public class WinLossReport{
 
 	private double getMaxWin(List<Trade> trades2) {
 		double maxWin = 0;
-		for(Trade t: trades) {
+		for(Trade t: this.rounds) {
 			if(t.getTradePl() > maxWin)
 				maxWin = t.getTradePl();
 		}
